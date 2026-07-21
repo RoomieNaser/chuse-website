@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUSÉ | We Are CHUSÉ | Official Website</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="landStyle.css">
+
+</head>
+<body>
+    <!--INTRO SECTION HERE-->
+    <nav class="navbar hidden" id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="assets/chuse-logo.png" alt="CHUSÉ">
+            </div>
+            <ul class="nav-links">
+                <li><a href="#listen">Listen</a></li>
+                <li><a href="#socials">Socials</a></li>
+                <li><a href="#reviews">Reviews</a></li>
+                <li><a href="#about">About Us</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <img src="assets/best-hamburger.svg" alt="Menu" class="hamburger-icon">
+                <ul class="hamburger-menu">
+                    <li><a href="download.html">Download Album</a></li>
+                    <li><a href="review-forum.html">Write Your Own Review</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="follow.html">Follow</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <section class="intro" id="intro">
+        <div class="intro-box" id="intro-box">
+            <div class="pronunciation-btn is-muted" id="play-pronunciation">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <path class="wave inner-wave" d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    <path class="wave outer-wave" d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+                    <line class="mute-slash" x1="16" y1="2" x2="2" y2="20"></line>
+                </svg>
+                <audio id="chuse-audio" src="assets/chuse-pronunciation.mp3"></audio>
+                <audio id="marquee-sound" src="assets/marqueeHover.mp3" preload="auto"></audio>
+            </div>
+
+
+            <div class="intro-text">
+                <span id="we-are"></span>
+                <span class="chuse-wrapper">
+                    <span class="dynamic-chuse" id="dynamic-chuse"></span>
+                    <div class="underline" id="underline"></div>
+                </span>
+            </div>
+            <a href="download.html" class="download-btn hidden" id="init-download-btn"> Download [Album] Now!</a>
+        </div>
+    </section>
+
+    <!--LISTEN SECTION HERE-->
+    <section class="listen" id="listen">
+        <h2 class="section-title left-align">Hear us out.</h2>
+        
+        <div class="listen-stage" id="listen-stage">
+            <div class="player-left-wrap">
+                <div id="hero-area">
+                    <div class="hero-main">
+                        <span class="middot">&middot;</span>
+                        <h1 id="hero-title">Disaster</h1>
+                    </div>
+                    <p class="hero-artist">CHUSÉ</p>
+                </div>
+
+                <!-- SPOTIFY-STYLE PLAYLIST -->
+                <div class="spotify-list" id="playlist">
+                    <div class="song-row active" data-src="assets/Disaster.mp3" data-name="Disaster" data-color="#FA8FFF">
+                        <div class="track-left">
+                            <span class="track-num">1</span>
+                            <span class="track-title">Disaster</span>
+                        </div>
+                        <span class="track-duration">3:27</span>
+                    </div>
+                    <div class="song-row" data-src="assets/dontStopCalling.mp3" data-name="Don't Stop Calling" data-color="#ffadad">
+                        <div class="track-left">
+                            <span class="track-num">2</span>
+                            <span class="track-title">Don't Stop Calling</span>
+                        </div>
+                        <span class="track-duration">2:56</span>
+                    </div>
+                    <div class="song-row" data-src="assets/Chloe.mp3" data-name="Chloe" data-color="#a0f4c3">
+                        <div class="track-left">
+                            <span class="track-num">3</span>
+                            <span class="track-title">Chloe</span>
+                        </div>
+                        <span class="track-duration">2:54</span>
+                    </div>
+                    <div class="song-row" data-src="assets/soSay.mp3" data-name="So Say" data-color="#8FFDFF">
+                        <div class="track-left">
+                            <span class="track-num">4</span>
+                            <span class="track-title">So Say</span>
+                        </div>
+                        <span class="track-duration">2:28</span>
+                    </div>
+
+                    <div class="song-row" data-src="assets/eyeCandy.mp3" data-name="Eye Candy" data-color="#A2FF8F">
+                        <div class="track-left">
+                            <span class="track-num">5</span>
+                            <span class="track-title">Eye Candy</span>
+                        </div>
+                        <span class="track-duration">2:46</span>
+                    </div>
+                </div>
+            </div>
+            <div class="center-visualizer">
+                <canvas id="ncs-canvas" width="500" height="500"></canvas>
+            </div>
+        </div> 
+
+
+        
+        <div class="bottom-player" id="bottom-player">
+            <button class="master-play-btn" id="master-play" tabindex="-1">
+                <img src="assets/play-icon.svg" alt="Play" class="icon-play" id="icon-play">
+                <img src="assets/pause-icon.svg" alt="Pause" class="icon-pause" id="icon-pause">
+            </button>
+            <div class="waveform-container" id="waveform"></div>
+            <div class="time-display" id="time-display">0:00</div>
+        </div>
+        <div class="review-link-wrapper">
+            <a href="review-forum.html" id="review-link" target="_blank">Want to review this song?</a>
+        </div>
+
+    </section>
+
+    <audio id="hover-sound" src="assets/hover-click.mp3" preload="auto"></audio>
+
+    <!--SOCIALS SECTION HERE-->
+    <section class="socials" id="socials">
+        <h2 class="section-title">Follow Our <span id="cycle-word" class="cycle-word">Journey.</span></h2>
+        <div class="bento-container">
+            
+            <a href="https://www.youtube.com/@wearechuse" target="_blank" class="bento-item youtube-social">
+                <span class="tag">Watch Our Videos</span>
+                <h3><img src="assets/youtube-logo.svg" alt="" class="hover-logo">YouTube</h3>
+            </a>
+
+            <a href="https://www.instagram.com/wearechuse.mp3/" target="_blank" class="bento-item instagram">
+                <span class="tag">Watch Our Reels</span>
+                <h3><img src="assets/instagram-logo.svg" alt="" class="hover-logo">Instagram</h3>
+            </a>
+
+            <a href="#" target="_blank" class="bento-item discord">
+                <span class="tag">Join Us</span>
+                <h3><img src="assets/discord-logo.svg" alt="" class="hover-logo">Discord</h3>
+            </a>
+
+            <a href="#" target="_blank" class="bento-item spotify">
+                <span class="tag">Want a break from the ads?</span>
+                <h3><img src="assets/spotify-logo.svg" alt="" class="hover-logo">Spotify</h3>
+            </a>
+
+            <a href="#" target="_blank" class="bento-item apple-music">
+                <span class="tag">Or perhaps you like Apple?</span>
+                <h3><img src="assets/apple-logo.svg" alt="" class="hover-logo">Apple Music</h3>
+            </a>
+
+            <a href="#" target="_blank" class="bento-item yt-music">
+                <span class="tag">You like diet coke, huh?</span>
+                <h3><img src="assets/ytmusic-logo.svg" alt="" class="hover-logo">YT Music</h3>
+            </a>
+
+            <div class="marquee-wrapper">
+                <div class="marquee-track">
+                    <a href="#" target="_blank"><img src="assets/amazon-logo.svg" alt="Amazon"></a>
+                    <a href="#" target="_blank"><img src="assets/deezer-logo.svg" alt="Deezer"></a>
+                    <a href="#" target="_blank"><img src="assets/tidal-logo.svg" alt="Tidal"></a>
+                    <a href="#" target="_blank"><img src="assets/pandora-logo.svg" alt="Pandora"></a>
+                    <a href="#" target="_blank" class="soundcloud-logo"><img src="assets/soundcloud-logo.svg" alt="SoundCloud"></a>
+                    <a href="#" target="_blank"><img src="assets/tencent-logo.svg" alt="Tencent"></a>
+                
+                    <a href="#" target="_blank"><img src="assets/amazon-logo.svg" alt="Amazon"></a>
+                    <a href="#" target="_blank"><img src="assets/deezer-logo.svg" alt="Deezer"></a>
+                    <a href="#" target="_blank"><img src="assets/tidal-logo.svg" alt="Tidal"></a>
+                    <a href="#" target="_blank"><img src="assets/pandora-logo.svg" alt="Pandora"></a>
+                    <a href="#" target="_blank"><img src="assets/soundcloud-logo.svg" alt="SoundCloud"></a>
+                    <a href="#" target="_blank"><img src="assets/tencent-logo.svg" alt="Tencent"></a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!--REVIEWS SECTION HERE-->
+    <section class="review" id="review">
+        <h2 class="section-title left-align">Music is supposed to be <span class="felt">felt</span></h2>
+    </section>
+    <!--SCRIPTS AND STUFF-->
+    <script src="https://unpkg.com/wavesurfer.js@7"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="landScript.js"></script>
+</body>
+</html>
