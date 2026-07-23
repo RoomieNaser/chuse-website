@@ -207,12 +207,17 @@ document.addEventListener("DOMContentLoaded", function() {
     const revealSections = [
         document.getElementById('socials'),
         document.getElementById('listen'),
-        document.getElementById('review')
+        document.getElementById('review'),
+        document.getElementById('about-title'),
+        document.querySelector('#roomie-row .member-bio'),
+        document.querySelector('#impu-row .member-bio'),
+        document.querySelector('#pra-row .member-bio'),
+        document.querySelector('#abya-row .member-bio')
     ];
 
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            const section = entry.target;
+            const section = entry.target.closest('.member-row') || entry.target;
             
             if (entry.isIntersecting) {
                 section.classList.add('reveal-active');
@@ -227,7 +232,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 }, 1200); 
 
             } else {
-                // 2. It went OUT of view through the bottom 
                 if (entry.boundingClientRect.top > 0) {
                     section.classList.add('reveal-hidden');
                     section.classList.remove('reveal-active');
@@ -455,39 +459,41 @@ const wireMesh = new THREE.Mesh(geometry, wireMaterial);
 scene.add(coreMesh, wireMesh);
 
 
-// Animation Loop
+
 // Animation Loop
 const drawVisualizer = () => {
     requestAnimationFrame(drawVisualizer);
     
     let activeBars = false;
     let bassScale = 1;
-    let reactiveRotation = 0.002; // <-- FIXED: Defined the variable here!
+    let reactiveRotation = 0.002; 
 
     // Audio Analysis
     if (isVisualizerSetup && wavesurfer?.isPlaying()) {
         analyser.getByteFrequencyData(dataArray);
+
+        const kickBass = (dataArray[1] + dataArray[2]) / 2;
         
-        // Isolate the lowest frequencies for the kick/sub-bass
-        const avgBass = (dataArray[0] + dataArray[1] + dataArray[2] + dataArray[3]) / 4;
-        
-        if (avgBass > 5 && wavesurfer.getVolume() > 0.05) {
-            activeBars = true;
+        if (kickBass > 5 && wavesurfer.getVolume() > 0.05) {
+            activeBars = true
+            const normalizedBass = kickBass / 255;
+            const punch = Math.pow(normalizedBass, 4); 
             
-            // Bigger sphere explosion
-            bassScale = 1 + (avgBass / 255) * 0.5; 
+            //PUNCH ITS ASS
+            bassScale = 1 + (punch * 0.3); 
             
-            // <-- FIXED: Calculate the reactive rotation based on the bass!
-            reactiveRotation = 0.005 + (avgBass / 255) * 0.02; 
+            reactiveRotation = 0.002 + (punch * 0.06); 
         }
     }
 
     // Sphere Transformation
     const targetScale = new THREE.Vector3(bassScale, bassScale, bassScale);
-    wireMesh.scale.lerp(targetScale, 0.25); // 0.25 for punchy responsiveness
-    coreMesh.scale.lerp(targetScale.clone().multiplyScalar(0.95), 0.25);
     
-    // Rotation (Applying the reactiveRotation everywhere instead of rotSpeed)
+    // DECAY
+    wireMesh.scale.lerp(targetScale, 0.15); 
+    coreMesh.scale.lerp(targetScale.clone().multiplyScalar(0.95), 0.15);
+    
+    // Rotation 
     wireMesh.rotation.y += reactiveRotation;
     wireMesh.rotation.x += activeBars ? reactiveRotation * 0.5 : 0; 
     coreMesh.rotation.y += reactiveRotation;
@@ -519,7 +525,7 @@ drawVisualizer();
             normalize: true 
         });
 
-        wavesurfer.load('assets/Disaster.mp3');
+        wavesurfer.load('assets/LYA.mp3');
         
         const formatTime = (seconds) => {
             const mins = Math.floor(seconds / 60);

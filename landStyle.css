@@ -249,10 +249,10 @@ body {
     bottom: -20px;
     background-image: 
         radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.55) 100%), 
-        url('assets/intro-bg2.jpg'); 
+        url('assets/websiteBG.webp'); 
     background-size: cover;
     background-position: center;
-    filter: blur(15px) brightness(0.5);
+    filter: brightness(0.5);
     z-index: -1; 
     opacity: 0; 
     transition: opacity 0.8s ease-in-out; 
@@ -904,6 +904,7 @@ section {
     left: 80px;
     width: 65%;
     z-index: 10;
+    margin-left: -30px;
 }
 
 /* Hero Section */
@@ -914,18 +915,19 @@ section {
 }
 
 #hero-title {
-    font-size: 6.5rem;
+    font-size: 5.5rem;
     font-weight: 900;
     margin: 0;
+    margin-left: -20px;
     line-height: 1;
     text-transform: uppercase;
 }
 
 .hero-artist {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: rgba(255, 255, 255, 0.5);
-    margin-top: 0px;
-    margin-left: 4.25%;
+    margin-top: 5px;
+    margin-left: 2vw;
     letter-spacing: 2px;
 }
 
@@ -938,7 +940,9 @@ section {
 .middot {
     color: #ffffff;
     font-size: 7rem;
-    line-height: 0; /* Keeps the dot perfectly centered with the text */
+    line-height: 0;
+    margin-left: -10px;
+    margin-right: 10px;
 }
 
 /* Spotify List Style */
@@ -1028,6 +1032,250 @@ section {
 
 
 
+
+.about {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 50px;
+    padding-bottom: 100px;
+    position: relative;
+}
+
+.about-doodles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 4;
+    overflow: hidden;
+}
+
+.doodle-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+
+}
+
+.doodle-wrap.reveal-hidden {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+.doodle-wrap.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.doodle-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.about .section-title {
+    position: relative;
+    z-index: 3;
+    font-family: "Montserrat";
+    font-size: 3rem;
+
+}
+
+.members-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%; 
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+.member-row {
+    position: relative;
+    width: 100%;
+    /* TWEAK: Adjust this negative overlap to pull the massive vertical images closer together */
+    margin-top: -90%; 
+    pointer-events: none;
+}
+
+#pra-row {
+    margin-top: -117%;
+}
+
+#pra-row .member-bio {
+    top: 42%;
+    width: 35%;
+}
+
+#abya-row {
+    margin-top: -115%;
+}
+
+#abya-row .member-bio {
+    top: 46%;
+    right: 38%;
+}
+
+.member-row:first-child {
+    margin-top: -67%;
+}
+
+.member-row.reverse {
+    flex-direction: row-reverse;
+}
+
+.composite-img {
+    width: 100%;
+    height: auto; 
+    display: block;
+    pointer-events: none;
+}
+
+
+.member-bio {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    /* TWEAK: Controls how wide the text paragraph is allowed to stretch */
+    width:50%; 
+
+}
+
+
+.member-bio .member-insta {
+    pointer-events: all;
+}
+
+.member-row:not(.reverse) .member-bio {
+    /* TWEAK: Move the text up/down relative to the full 3000px height */
+    top: 50%;  
+    /* TWEAK: Move the text left/right relative to the 1920px width */
+    left: 38%; 
+    text-align: left;
+}
+
+.member-row.reverse .member-bio {
+    /* TWEAK: Move the text up/down relative to the full 3000px height */
+    top: 37%;  
+    /* TWEAK: Move the text left/right relative to the 1920px width */
+    right: 36%; 
+    text-align: left;
+}
+
+.member-row.reverse .member-name {
+    text-align: right;
+    margin-left: 0; 
+}
+
+
+.member-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--color-text-on-dark);
+    margin-bottom: 5px;
+    line-height: 1;
+    letter-spacing: 2px;
+    margin-left: -10px;
+}
+
+.role-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-bottom: 25px;
+}
+
+.member-role {
+    font-family: 'Roboto', sans-serif;
+    color: var(--theme-color, #FA8FFF);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.member-insta {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-family: 'Roboto', sans-serif;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+    transform: translateY(-2.5px);
+    position: relative;
+    z-index: 3;
+}
+
+.member-insta:hover {
+    color: var(--color-text-on-dark);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.member-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+    margin-bottom: 25px;
+}
+
+.member-row.reverse .member-divider {
+    background: linear-gradient(270deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+}
+
+.member-desc {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 300;
+}
+
+.member-row.reverse .role-wrapper {
+    justify-content: flex-end;
+}
+
+
+.member-row.reveal-hidden {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+.member-row.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.section-title.left-align .gng {
+    display: inline;
+    position: relative;
+    color: rgb(255, 53, 53);
+    font-weight: 900;
+}
+
+.section-title.reveal-hidden {
+    opacity: 0;
+    transform: translateY(40px); 
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.3, 1);
+}
+
+.section-title.reveal-active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+
+
 @keyframes slideInRight {
     from {
         opacity: 0;
@@ -1053,18 +1301,6 @@ section {
 }
 .dark-theme { background-color: var(--color-dark); color: var(--color-text-on-dark); }
 .light-theme { background-color: var(--color-light); color: var(--color-text-on-light); }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @media (hover: hover) { 
