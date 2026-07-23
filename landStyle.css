@@ -432,6 +432,7 @@ section {
     text-transform: uppercase;
     letter-spacing: 3px;
     color: var(--color-text-on-dark);
+    z-index: 50;
 }
 
 .socials {
@@ -440,11 +441,13 @@ section {
     justify-content: flex-start; 
     padding-top: 50px; 
     padding-bottom: 20px; 
+    margin-top: -58%;
+    z-index: 50;
 
 }
 
 
-/* --- 1. THE 12-COLUMN GRID MATH --- */
+/* cute bento box*/
 .bento-container {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -472,8 +475,9 @@ section {
     
     /* Base State: Square with sharp corners */
     border-radius: 4px; 
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: #121212;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    
     
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.25, 1, 0.3, 1);
@@ -483,7 +487,7 @@ section {
     transform: translateY(-5px);
     border-radius: 35px; 
     
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: #171717;
     border-color: rgba(255, 255, 255, 0.3);
 }
 .spotify { 
@@ -1142,7 +1146,7 @@ section {
 
 .member-bio {
     position: absolute;
-    z-index: 3;
+    z-index: 6;
     pointer-events: none;
     /* TWEAK: Controls how wide the text paragraph is allowed to stretch */
     width:50%; 

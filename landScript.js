@@ -202,6 +202,21 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
 
+    //Performance tracking:
+    let isIntroVisible = true;
+    let isListenVisible = false;
+
+    const perfObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.target.classList.contains('intro')){
+                isListenVisible = entry.isIntersecting;
+            }
+        });
+    }, {threshold: 0});
+
+    perfObserver.observe(document.querySelector('.intro'));
+    perfObserver.observe(document.getElementById('listen'));
+
     //BIG BOY SCROLL REVEAL FOR ALL IDS
     // Add any future section IDs to this array
     const revealSections = [
@@ -435,8 +450,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     animateBrush();
 
-    //NCS VISUALISER STUFF
-// --- 3D ENGINE SETUP ---
+
+//NCS VISUALISER STUFF
 const canvas = document.getElementById('ncs-canvas');
 let audioCtx, analyser, dataArray, bufferLength;
 let isVisualizerSetup = false;
@@ -445,12 +460,21 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
 camera.position.z = 100;
 
-const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+// utilize gpu ts way too heavy
+const renderer = new THREE.WebGLRenderer({ 
+    canvas, 
+    alpha: true, 
+    antialias: true,
+    powerPreference: "high-performance"
+});
 renderer.setSize(400, 400);
-renderer.setPixelRatio(window.devicePixelRatio);
 
-// Sphere Geometry
-const geometry = new THREE.IcosahedronGeometry(25, 2); 
+// OPTIMIZATION 1: Capping pixel ratio 
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+
+// OPTIMIZATION 2: don't need as much detail dude
+const geometry = new THREE.IcosahedronGeometry(25, 1); 
+
 const coreMaterial = new THREE.MeshBasicMaterial({ color:0xC954FF, transparent: true, opacity: 0.3 });
 const wireMaterial = new THREE.MeshBasicMaterial({ color: 0xf9f1f0, wireframe: true, transparent: true, opacity: 0.7 });
 
@@ -463,6 +487,7 @@ scene.add(coreMesh, wireMesh);
 // Animation Loop
 const drawVisualizer = () => {
     requestAnimationFrame(drawVisualizer);
+    if (!isListenVisible) return;
     
     let activeBars = false;
     let bassScale = 1;
@@ -628,15 +653,15 @@ drawVisualizer();
 
 });
 
+//scroll throttling - had to use ai for this ffs
+let isScrollTicking = false;
+
 window.addEventListener('scroll', () => {
     const scrollPos = window.scrollY;
     const introSection = document.querySelector('.intro');
     const introBox = document.getElementById('intro-box');
-    const navLinks = document.querySelectorAll('.nav-links a');
-    const sections = document.querySelectorAll('section');
 
-    // 1. Shrink the Intro Box
-    // CHANGED TO 10: This ensures it doesn't instantly unfold when scrolling to high-up sections!
+    // 1. INSTANT EXECUTION: Keep the hero shrink snappy and perfectly responsive
     if (scrollPos > 10) {
         introBox.classList.add('shrunk-box');
         introSection.classList.add('shrunk-section'); 
@@ -645,20 +670,36 @@ window.addEventListener('scroll', () => {
         introSection.classList.remove('shrunk-section'); 
     }
 
-    // 2. Active Link Underlining Logic
-    let current = "";
-    sections.forEach((section) => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (pageYOffset >= sectionTop - 200) {
-            current = section.getAttribute("id");
-        }
-    });
+    // 2. THROTTLED EXECUTION: Save the heavy navigation layout math for the animation frames
+    if (!isScrollTicking) {
+        window.requestAnimationFrame(() => {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            const sections = document.querySelectorAll('section');
 
-    navLinks.forEach((link) => {
-        link.classList.remove("active");
-        if (link.getAttribute("href").includes(current)) {
-            link.classList.add("active");
-        }
-    });
-});
+            let current = "";
+            
+            // This .offsetTop check is the heavy lifter, so it stays throttled!
+            sections.forEach((section) => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLinks.forEach((link) => {
+                link.classList.remove("active");
+                const href = link.getAttribute("href");
+                // Added a safety check to ensure href exists
+                if (href && current && href.includes(current)) {
+                    link.classList.add("active");
+                }
+            });
+
+            // Open the gate for the next frame
+            isScrollTicking = false; 
+        });
+        
+        // Close the gate until the frame finishes drawing
+        isScrollTicking = true; 
+    }
+}, { passive: true }); // ADDED: passive:true is a huge free scroll optimization!
