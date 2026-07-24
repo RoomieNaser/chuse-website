@@ -44,12 +44,13 @@ body {
     top: 0;
     width: 100%;
     background-color: rgba(18, 18, 18, 0.7);
-    backdrop-filter: blur(10px);
+     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    padding: 1rem 0;
+    padding: 0.2rem;
+    padding-top: 10px;
     z-index: 1000;
     transition: opacity 0.5s ease-in-out; 
-    box-shadow: #121212;
+    box-shadow: 0 4px 15px rgba(18, 18, 18, 0.5);
 }
 
 .nav-container {
@@ -94,7 +95,8 @@ body {
 }
 
 .nav-links a:hover {
-    filter: brightness(0.9);
+     filter: brightness(0.9);
+
 }
 
 .nav-links a::after{
@@ -247,19 +249,20 @@ body {
     left: -20px; 
     right: -20px; 
     bottom: -20px;
+
+    /*im baking ts into the actual thing so it doesn't recalculate at 60fps*/
     background-image: 
+        linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
         radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.55) 100%), 
         url('assets/websiteBG.webp'); 
+        
     background-size: cover;
     background-position: center;
-    filter: brightness(0.5);
+
     z-index: -1; 
     opacity: 0; 
     transition: opacity 0.8s ease-in-out; 
-    transform: scale(1.1) translate(var(--bg-x, 0px), var(--bg-y, 0px));
-    will-change: transform; 
 }
-
 
 .intro-box.reveal-bg::before {
     opacity: 1;
@@ -717,7 +720,7 @@ section {
 
 .section-title.left-align {
     text-align: left;
-    font-size: 39px;
+    font-size: 4rem;
     margin-left: 110px;
     margin-bottom: 20px;
     margin-top: 0;
@@ -1025,7 +1028,7 @@ section {
     overflow: hidden;
 }
 
-.section-title.left-align .felt {
+.section-title .felt {
     display: inline;
     position: relative;
     margin: none;
@@ -1308,20 +1311,33 @@ section {
 
 
 @media (hover: hover) { 
-    #we-are, #dynamic-chuse {
+    #dynamic-chuse {
         --active-color: var(--color-text-on-dark); 
         color: transparent !important; 
+
+        /* 1. Center the gradient perfectly over the text */
         background-image:
-            radial-gradient(
-                circle var(--brush-size, 0px) at var(--mouse-x, 0px) var(--mouse-y, 0px),
-                #65def1 0%,  
-                #f481ca 40%,  
-                transparent 100%
-            ),
+            radial-gradient(circle closest-side, #65def1 0%, #f481ca 40%, transparent 100%),
             linear-gradient(var(--active-color), var(--active-color));
-        background-attachment: fixed;
+        
+        background-repeat: no-repeat, no-repeat;
+        background-position: center, center;
+        
         -webkit-background-clip: text;
         background-clip: text;
+        
+        /* 2. Run the shrink animation once on load */
+        animation: shrinkToZero 2.5s cubic-bezier(0.25, 1, 0.3, 1) forwards;
+        animation-delay: 2.8s; /* Adjust this so it times perfectly with your typing effect */
+    }
+}
+
+@keyframes shrinkToZero {
+    0% { 
+        background-size: 3000px 3000px, 100% 100%; 
+    }
+    100% { 
+        background-size: 0px 0px, 100% 100%; 
     }
 }
 

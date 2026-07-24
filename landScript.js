@@ -10,6 +10,10 @@ window.onload = function() {
     }, 10); 
 };
 
+//for the weird glitch that came back
+    let isAutoScrolling = false;
+    let scrollEndTimer = null;
+
 document.addEventListener("DOMContentLoaded", function() {
     //HTML consts and vars gng
     const introBox = document.getElementById('intro-box');
@@ -58,7 +62,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     //my first synchronization problem
     let mutex = true;
+
     
+
     document.querySelectorAll('.nav-links a[href^="#"], .hamburger-menu a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault(); 
@@ -68,8 +74,8 @@ document.addEventListener("DOMContentLoaded", function() {
             
             if (targetSection) {
                 const introSection = document.querySelector('.intro');
+                isAutoScrolling = true; 
                 
-                // Get the original baseline position of the section
                 let targetPosition = targetSection.offsetTop;
                 
                 if (window.scrollY <= 10) {
@@ -77,6 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     const currentIntroHeight = introSection.offsetHeight;
                     const layoutShiftAmount = currentIntroHeight - finalIntroHeight;
                     targetPosition -= layoutShiftAmount;
+                    
                     introBox.classList.add('shrunk-box');
                     introSection.classList.add('shrunk-section');
                 }
@@ -209,6 +216,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const perfObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.target.classList.contains('intro')){
+                isIntroVisible = entry.isIntersecting;
+            }
+            if (entry.target.id === 'listen'){
                 isListenVisible = entry.isIntersecting;
             }
         });
@@ -430,25 +440,6 @@ document.addEventListener("DOMContentLoaded", function() {
         targetBrushSize = 0;
     });
 
-    function animateBrush(){
-        currentBrushSize += (targetBrushSize - currentBrushSize) * 0.25;
-
-        currentBgX += (targetBgX - currentBgX) * 0.1;
-        currentBgY += (targetBgY - currentBgY) * 0.1;
-
-        introTextSpans.forEach(span => {
-            span.style.setProperty('--brush-size', `${currentBrushSize}px`);
-            span.style.setProperty('--mouse-x', `${mouseX}px`);
-            span.style.setProperty('--mouse-y', `${mouseY}px`);
-        });
-
-        introBox.style.setProperty('--bg-x', `${currentBgX}px`);
-        introBox.style.setProperty('--bg-y', `${currentBgY}px`);
-
-        requestAnimationFrame(animateBrush);
-    }
-
-    animateBrush();
 
 
 //NCS VISUALISER STUFF
@@ -460,34 +451,84 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
 camera.position.z = 100;
 
+let baseSpin = {
+    x: (Math.random() - 0.5) * 0.02,
+    y: (Math.random() - 0.5) * 0.02
+};
+
+let currentSpin = {
+    x: baseSpin.x, y: baseSpin.y
+};
+
+canvas.addEventListener('mousemove', (e) => {
+    currentSpin.y += e.movementX * 0.0002;
+    currentSpin.x += e.movementY * 0.0002;
+});
+
 // utilize gpu ts way too heavy
 const renderer = new THREE.WebGLRenderer({ 
     canvas, 
-    alpha: true, 
     antialias: true,
     powerPreference: "high-performance"
 });
 renderer.setSize(400, 400);
+renderer.setClearColor(0x121212, 1); 
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
 // OPTIMIZATION 1: Capping pixel ratio 
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
 // OPTIMIZATION 2: don't need as much detail dude
-const geometry = new THREE.IcosahedronGeometry(25, 1); 
+const geometry = new THREE.IcosahedronGeometry(25, 4); 
 
 const coreMaterial = new THREE.MeshBasicMaterial({ color:0xC954FF, transparent: true, opacity: 0.3 });
 const wireMaterial = new THREE.MeshBasicMaterial({ color: 0xf9f1f0, wireframe: true, transparent: true, opacity: 0.7 });
 
 const coreMesh = new THREE.Mesh(geometry, coreMaterial);
+coreMesh.scale.set(0.95, 0.95, 0.95);
 const wireMesh = new THREE.Mesh(geometry, wireMaterial);
 scene.add(coreMesh, wireMesh);
 
 
 
 // Animation Loop
-const drawVisualizer = () => {
+let lastRenderTime = 0;
+const targetFPS = 60; 
+const frameInterval = 1000 / targetFPS;
+
+const drawVisualizer = (timestamp) => {
     requestAnimationFrame(drawVisualizer);
     if (!isListenVisible) return;
+
+    //fps throttle
+    if (timestamp - lastRenderTime < frameInterval) return;
+    lastRenderTime = timestamp; // Update the clock
+
+    //friction
+    currentSpin.x += (baseSpin.x - currentSpin.x) * 0.02;
+    currentSpin.y += (baseSpin.y - currentSpin.y) * 0.02;
+
+    //maxSpeed
+    const maxSpeed = 0.07;
+    currentSpin.x = Math.max(-maxSpeed, Math.min(maxSpeed, currentSpin.x));
+    currentSpin.y = Math.max(-maxSpeed, Math.min(maxSpeed, currentSpin.y));
+
+    if (!isVisualizerSetup || !wavesurfer?.isPlaying()){
+        wireMesh.rotation.y += currentSpin.y;
+        wireMesh.rotation.x += currentSpin.x;
+        coreMesh.rotation.y += currentSpin.y;
+        coreMesh.rotation.x += currentSpin.x;
+
+
+        if (wireMesh.scale.x > 1.001){
+            const idleScale = new THREE.Vector3(1, 1, 1);
+            wireMesh.scale.lerp(idleScale, 0.15);
+            coreMesh.scale.lerp(idleScale.clone().multiplyScalar(0.95), 0.15);
+        }
+        renderer.render(scene, camera);
+        return;
+    }
+
     
     let activeBars = false;
     let bassScale = 1;
@@ -496,49 +537,47 @@ const drawVisualizer = () => {
     // Audio Analysis
     if (isVisualizerSetup && wavesurfer?.isPlaying()) {
         analyser.getByteFrequencyData(dataArray);
-
         const kickBass = (dataArray[1] + dataArray[2]) / 2;
         
         if (kickBass > 5 && wavesurfer.getVolume() > 0.05) {
-            activeBars = true
+            activeBars = true;
             const normalizedBass = kickBass / 255;
             const punch = Math.pow(normalizedBass, 4); 
-            
-            //PUNCH ITS ASS
             bassScale = 1 + (punch * 0.3); 
-            
-            reactiveRotation = 0.002 + (punch * 0.06); 
+            currentSpin.y += Math.sign(currentSpin.y) * punch * 0.01;
+            currentSpin.x += Math.sign(currentSpin.x) * punch * 0.005;
         }
     }
 
+    currentSpin.x = Math.max(-maxSpeed, Math.min(maxSpeed, currentSpin.x));
+    currentSpin.y = Math.max(-maxSpeed, Math.min(maxSpeed, currentSpin.y));
+
     // Sphere Transformation
     const targetScale = new THREE.Vector3(bassScale, bassScale, bassScale);
-    
-    // DECAY
     wireMesh.scale.lerp(targetScale, 0.15); 
     coreMesh.scale.lerp(targetScale.clone().multiplyScalar(0.95), 0.15);
     
-    // Rotation 
-    wireMesh.rotation.y += reactiveRotation;
-    wireMesh.rotation.x += activeBars ? reactiveRotation * 0.5 : 0; 
-    coreMesh.rotation.y += reactiveRotation;
+    wireMesh.rotation.y += currentSpin.y;
+    wireMesh.rotation.x += currentSpin.x; 
+    coreMesh.rotation.y += currentSpin.y;
+    coreMesh.rotation.x += currentSpin.x;
+
+
 
     renderer.render(scene, camera);
 };
 
-drawVisualizer();
+//using timestamps now
+requestAnimationFrame(drawVisualizer);
 
-    // WAVESURFER STUFF
-    const waveformContainer = document.getElementById('waveform');
-    const masterPlayBtn = document.getElementById('master-play');
-    const timeDisplay = document.getElementById('time-display');
+// WAVESURFER STUFF
+const waveformContainer = document.getElementById('waveform');
+const masterPlayBtn = document.getElementById('master-play');
+const timeDisplay = document.getElementById('time-display');
+let fadeInterval;
     
-    
-    // NEW: We need a variable to track our fade animation so we can cancel it if they click rapidly
-    let fadeInterval;
-    
-    if (waveformContainer && masterPlayBtn) {
-        wavesurfer = WaveSurfer.create({
+if (waveformContainer && masterPlayBtn) {
+    wavesurfer = WaveSurfer.create({
             container: '#waveform',
             waveColor: 'rgba(255, 255, 255, 0.8)', 
             progressColor: 'rgba(197, 6, 255, 0.93)', 
@@ -551,7 +590,7 @@ drawVisualizer();
         });
 
         wavesurfer.load('assets/LYA.mp3');
-        
+
         const formatTime = (seconds) => {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
@@ -572,28 +611,25 @@ drawVisualizer();
         //global sync for play and pause
         wavesurfer.on('play', () => masterPlayBtn.classList.add('is-playing'));
         wavesurfer.on('pause', () => masterPlayBtn.classList.remove('is-playing'));
-
-        // Add this right above your masterPlayBtn logic
         function wakeUpVisualizer() {
             if (!isVisualizerSetup) {
                 const audioElement = wavesurfer.getMediaElement();
                 audioElement.crossOrigin = "anonymous"; 
-                
+
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 analyser = audioCtx.createAnalyser();
-                
+
                 const source = audioCtx.createMediaElementSource(audioElement);
                 source.connect(analyser);
                 analyser.connect(audioCtx.destination);
-                
+
                 analyser.fftSize = 256; 
                 bufferLength = analyser.frequencyBinCount;
                 dataArray = new Uint8Array(bufferLength);
-                
+
                 isVisualizerSetup = true;
             }
-            
-            // Always make sure it's awake!
+
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
@@ -601,17 +637,16 @@ drawVisualizer();
         //FADE FAKER
         masterPlayBtn.addEventListener('click', () => {
             wakeUpVisualizer();
-
             clearInterval(fadeInterval);
             const fadeSteps = 20; 
             const stepTime = 15; 
-            
+
             if (wavesurfer.isPlaying()) {
                 let currentVol = wavesurfer.getVolume();
-                
+
                 fadeInterval = setInterval(() => {
                     currentVol -= (1 / fadeSteps);
-                    
+
                     if (currentVol <= 0.05) {
                         wavesurfer.setVolume(0);
                         wavesurfer.pause();
@@ -619,27 +654,25 @@ drawVisualizer();
                         if (timeDisplay) {
                             timeDisplay.classList.remove('is-active-time');
                         }
-
                         clearInterval(fadeInterval);
                     } else {
                         wavesurfer.setVolume(currentVol);
                     }
                 }, stepTime);
-                
+
             } else {
                 wavesurfer.setVolume(0);
                 wavesurfer.play();
                 masterPlayBtn.classList.add('is-playing');
-
                 if (timeDisplay){
                     timeDisplay.classList.add('is-active-time');
                 }
-                
+
                 let currentVol = 0;
-                
+
                 fadeInterval = setInterval(() => {
                     currentVol += (1 / fadeSteps);
-                    
+
                     if (currentVol >= 0.95) { // When it's basically full volume, lock it to 1
                         wavesurfer.setVolume(1);
                         clearInterval(fadeInterval);
@@ -650,8 +683,9 @@ drawVisualizer();
             }
         });
     }
-
 });
+
+
 
 //scroll throttling - had to use ai for this ffs
 let isScrollTicking = false;
@@ -661,24 +695,33 @@ window.addEventListener('scroll', () => {
     const introSection = document.querySelector('.intro');
     const introBox = document.getElementById('intro-box');
 
-    // 1. INSTANT EXECUTION: Keep the hero shrink snappy and perfectly responsive
-    if (scrollPos > 10) {
-        introBox.classList.add('shrunk-box');
-        introSection.classList.add('shrunk-section'); 
-    } else {
-        introBox.classList.remove('shrunk-box');
-        introSection.classList.remove('shrunk-section'); 
+    if (isAutoScrolling) {
+        clearTimeout(scrollEndTimer);
+        scrollEndTimer = setTimeout(() => {
+            isAutoScrolling = false;
+        }, 150); 
     }
 
-    // 2. THROTTLED EXECUTION: Save the heavy navigation layout math for the animation frames
+    if (scrollPos > 10) {
+        if (!introBox.classList.contains('shrunk-box')) {
+            introBox.classList.add('shrunk-box');
+            introSection.classList.add('shrunk-section'); 
+        }
+    } else {
+        if (!isAutoScrolling) {
+            if (introBox.classList.contains('shrunk-box')) {
+                introBox.classList.remove('shrunk-box');
+                introSection.classList.remove('shrunk-section'); 
+            }
+        }
+    }
+
     if (!isScrollTicking) {
         window.requestAnimationFrame(() => {
             const navLinks = document.querySelectorAll('.nav-links a');
             const sections = document.querySelectorAll('section');
-
             let current = "";
-            
-            // This .offsetTop check is the heavy lifter, so it stays throttled!
+
             sections.forEach((section) => {
                 const sectionTop = section.offsetTop;
                 if (window.pageYOffset >= sectionTop - 200) {
@@ -689,17 +732,14 @@ window.addEventListener('scroll', () => {
             navLinks.forEach((link) => {
                 link.classList.remove("active");
                 const href = link.getAttribute("href");
-                // Added a safety check to ensure href exists
                 if (href && current && href.includes(current)) {
                     link.classList.add("active");
                 }
             });
 
-            // Open the gate for the next frame
             isScrollTicking = false; 
         });
         
-        // Close the gate until the frame finishes drawing
         isScrollTicking = true; 
     }
-}, { passive: true }); // ADDED: passive:true is a huge free scroll optimization!
+}, { passive: true });
