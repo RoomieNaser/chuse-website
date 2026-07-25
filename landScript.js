@@ -11,8 +11,8 @@ window.onload = function() {
 };
 
 //for the weird glitch that came back
-    let isAutoScrolling = false;
-    let scrollEndTimer = null;
+let isAutoScrolling = false;
+let scrollEndTimer = null;
 
 document.addEventListener("DOMContentLoaded", function() {
     //HTML consts and vars gng
@@ -240,6 +240,43 @@ document.addEventListener("DOMContentLoaded", function() {
         document.querySelector('#abya-row .member-bio')
     ];
 
+    //For the review boxes
+    const featuredContainer = document.getElementById('featured');
+    const reviewBoxes = document.querySelectorAll('.review-box');
+
+    reviewBoxes.forEach(box => box.classList.add('reveal-hidden'));
+
+    const staggerObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                reviewBoxes.forEach((box, index) => {
+                    setTimeout(() => {
+                        box.classList.add('reveal-active');
+                        box.classList.remove('reveal-hidden');
+
+                        clearTimeout(box.cleanupTimeout);
+                        box.cleanupTimeout = setTimeout(() => {
+                            box.classList.remove('reveal-active');
+                        }, 1200);
+                    }, index * 100);
+                });
+            } else {
+                if (entry.boundingClientRect.top > 0) {
+                    reviewBoxes.forEach(box => {
+                        box.classList.add('reveal-hidden');
+                        box.classList.remove('reveal-active');
+                    });
+                }
+            }
+        });
+    }, {
+        threshold: 0.15
+    });
+
+    if (featuredContainer) {
+        staggerObserver.observe(featuredContainer);
+    }
+
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const section = entry.target.closest('.member-row') || entry.target;
@@ -360,7 +397,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         // 2. Song Change
         row.addEventListener('click', function() {
-            if (this.classList.contains('active')) return;
+            if (this.classList.contains('active')) {
+                if (wavesurfer) {
+                    wakeUpVisualizer();
+                    wavesurfer.playPause();
+                }
+                return;
+            }
 
             const newName = this.getAttribute('data-name');
             const newSrc = this.getAttribute('data-src');
@@ -416,29 +459,55 @@ document.addEventListener("DOMContentLoaded", function() {
             
         });
     });
-    });
 
-    typeShit();
+    //Reviews toggle
+    const seeMoreBtn = document.getElementById('see-more-btn');
+    const showLessBtn = document.getElementById('show-less-btn');
+    const allReviewsList = document.getElementById('all-reviews-list');
+    const toggleWrapTop = document.getElementById('toggle-wrap-top');
+    const reviewSection = document.getElementById('review');
 
-    // GO PAINT ITS ASS BRO LES GOOO
-    introBox.addEventListener('mousemove', (e) => {
-        if (!mutex){
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            targetBrushSize = 100;
+    if (seeMoreBtn && showLessBtn && allReviewsList) {
+        seeMoreBtn.addEventListener('click', () => {
+            allReviewsList.classList.remove('hidden');
+            toggleWrapTop.classList.add('hidden');
 
-            const centerX = window.innerWidth/2;
-            const centerY = window.innerHeight/2;
-            const mvmtStrength = 0.01;
+            setTimeout(() => {
+                allReviewsList.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });  
+            }, 50);
+        });
 
-            targetBgX = (mouseX - centerX) * mvmtStrength;
-            targetBgY = (mouseY - centerY) * mvmtStrength;
-        }
-    });
+        showLessBtn.addEventListener('click', () => {
+            allReviewsList.classList.add('hidden');
+            toggleWrapTop.classList.remove('hidden');
+            reviewSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    }
+});
 
-    introBox.addEventListener('mouseleave', () => {
-        targetBrushSize = 0;
-    });
+typeShit();
+// GO PAINT ITS ASS BRO LES GOOO
+introBox.addEventListener('mousemove', (e) => {
+    if (!mutex){
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        targetBrushSize = 100;
+        const centerX = window.innerWidth/2;
+        const centerY = window.innerHeight/2;
+        const mvmtStrength = 0.01;
+        targetBgX = (mouseX - centerX) * mvmtStrength;
+        targetBgY = (mouseY - centerY) * mvmtStrength;
+    }
+});
+introBox.addEventListener('mouseleave', () => {
+    targetBrushSize = 0;
+});
 
 
 
@@ -475,23 +544,65 @@ renderer.setSize(400, 400);
 renderer.setClearColor(0x121212, 1); 
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
-// OPTIMIZATION 1: Capping pixel ratio 
+//Capping pixel ratio 
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 
-// OPTIMIZATION 2: don't need as much detail dude
-const geometry = new THREE.IcosahedronGeometry(25, 4); 
+//don't need as much detail dude
+let sphereDetail = 4;
+let sphereGeometry = new THREE.IcosahedronGeometry(25, sphereDetail); 
 
 const coreMaterial = new THREE.MeshBasicMaterial({ color:0xC954FF, transparent: true, opacity: 0.3 });
 const wireMaterial = new THREE.MeshBasicMaterial({ color: 0xf9f1f0, wireframe: true, transparent: true, opacity: 0.7 });
 
-const coreMesh = new THREE.Mesh(geometry, coreMaterial);
+const coreMesh = new THREE.Mesh(sphereGeometry, coreMaterial);
 coreMesh.scale.set(0.95, 0.95, 0.95);
-const wireMesh = new THREE.Mesh(geometry, wireMaterial);
+const wireMesh = new THREE.Mesh(sphereGeometry, wireMaterial);
 scene.add(coreMesh, wireMesh);
 
+const polyDownBtn = document.getElementById('poly-down');
+const polyUpBtn = document.getElementById('poly-up');
+const polyVal = document.getElementById('poly-value');
+
+//udpate logic
+function updateSphereDetail(newDetail) {
+    if (newDetail < 0 || newDetail > 9) return;
+
+    sphereDetail = newDetail
+    polyVal.textContent = sphereDetail;
+
+    const newGeometry = new THREE.IcosahedronGeometry(25, sphereDetail);
+    coreMesh.geometry = newGeometry;
+    wireMesh.geometry = newGeometry;
+
+    //dispose and update
+    sphereGeometry.dispose();
+    sphereGeometry = newGeometry;
+
+    //managing buttons at 0 and 9
+    if (sphereDetail === 0) {
+        polyDownBtn.style.visibility = 'hidden';
+    } else {
+        polyDownBtn.style.visibility = 'visible';
+    }
+    if (sphereDetail === 9) {
+        polyUpBtn.style.visibility = 'hidden';
+    } else {
+        polyUpBtn.style.visibility = 'visible';
+    }
+}
+
+if (polyDownBtn && polyUpBtn) {
+    polyDownBtn.addEventListener('click', () => {
+        updateSphereDetail(sphereDetail - 1);
+    });
+    polyUpBtn.addEventListener('click', () => {
+        updateSphereDetail(sphereDetail + 1);
+    })
+}
 
 
-// Animation Loop
+
+//Animation Loop
 let lastRenderTime = 0;
 const targetFPS = 60; 
 const frameInterval = 1000 / targetFPS;
