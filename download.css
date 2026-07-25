@@ -1,0 +1,193 @@
+body {
+    background-color: #050505;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.download-wrapper {
+    width: 95vw;
+    height: 95vh;
+    display: flex;
+    box-sizing: border-box;
+}
+
+.download-squircle {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #0d0d0d;
+    border-radius: 38px; 
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+
+.download-squircle::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 760px rgb(0, 0, 0);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.back-btn.inside-btn {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    z-index: 10;
+}
+
+.squircle-img {
+    position: absolute;
+    top: 0;
+    right: -20%;
+    width: 85%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 100%);
+    mask-image: linear-gradient(to left, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 100%);
+    z-index: 0;
+}
+
+.checkout-section {
+    position: relative;
+    z-index: 2; 
+    width: 100%;
+    max-width: 680px;
+    margin-left: 80px;
+    padding: 20px 0;
+}
+
+.download-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3rem;
+    color: var(--theme-color, #FA8FFF);
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    pointer-events: none;
+}
+
+.download-subtitle {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0 0 40px 3px;
+    line-height: 1.5;
+}
+
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.input-group label {
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.85rem;
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.checkout-form input[type="email"],
+.checkout-form input[type="number"] {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.2rem;
+    padding: 18px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    color-scheme: dark;
+}
+
+.checkout-form input:focus {
+    outline: none;
+    border-color: var(--theme-color, #FA8FFF);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+input[type="number"]::-webkit-inner-spin-button, 
+input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    background: transparent;
+}
+
+.price-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.currency-symbol {
+    position: absolute;
+    left: 20px;
+    color: var(--theme-color, #FA8FFF);
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.price-input-wrapper input[type="number"] {
+    padding-left: 45px;
+}
+
+.submit-btn {
+    font-family: 'Roboto' !important;
+    text-transform: uppercase;
+    margin-top: 15px;
+    margin-bottom: 0 !important;
+    padding: 20px !important;
+    height: auto !important;
+    line-height: normal !important;
+    font-size: 1.2rem;
+    width: 100%;
+    text-align: center;
+    background-color: var(--theme-color, #FA8FFF) !important;
+    color: #000 !important;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: background-color 0.4s ease, color 0.4s ease !important;
+}
+
+.submit-btn:hover {
+    background-color: #fff !important;
+    transform: none !important;
+}
+
+.intl-payment-link {
+    text-align: center; 
+    margin-top: 0;
+    padding: 0;
+}
+
+.intl-payment-link p {
+    color: rgba(255,255,255,0.6); 
+    font-family: 'Roboto', sans-serif; 
+    font-size: 1.1rem; 
+    margin: 0;
+}

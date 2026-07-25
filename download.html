@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHUSÉ - Download Page</title>
+    <link rel="stylesheet" href="download.css">
+    <link rel="stylesheet" href="landStyle.css">
+    <link rel="stylesheet" href="follow.css">
+</head>
+<body>
+    <div class="download-wrapper">
+        
+        <div class="download-squircle">
+            <a href="index.html" class="back-btn inside-btn">Back To Home</a>
+            <img src="assets/websiteBG.webp" alt="O.F.E Background" class="squircle-img">
+            <div class="checkout-section">
+                <h1 class="download-title">Download O.F.E.</h1>
+                <p class="download-subtitle">Name your price. Enter $0 to download for free! We'd appreciate a tip tho :)</p>
+
+                <form id="download-form" class="checkout-form">
+                    <div class="input-group">
+                        <label for="user-email">Email Address</label>
+                        <input type="email" id="user-email" placeholder="e.g. wearechuse@gmail.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="user-price">Name Your Price (INR)</label>
+                        <div class="price-input-wrapper">
+                            <span class="currency-symbol">₹</span>
+                            <input type="number" id="user-price" min="0" step="0.50" value="2" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="checkout-btn" class="pill-btn submit-btn">Download Now</button>
+                        <div class="intl-payment-link">
+                            <p>
+                                Not in India? <a href="https://ko-fi.com/wearechuse" target="_blank" style="color: var(--theme-color, #FA8FFF); text-decoration: none; border-bottom: 1px dotted var(--theme-color);">Buy me a Ko-fi instead!</a>
+                            </p>
+                        </div>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>

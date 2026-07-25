@@ -34,6 +34,17 @@ body {
   overflow-x: hidden; 
 }
 
+a {
+    text-decoration: underline wavy;
+    text-decoration-thickness: 0;
+    transition: color 0.2s, text-decoration-thickness 0.2s;
+}
+
+a:hover {
+    color: #FA8FFF;
+    text-decoration-thickness: auto;
+}
+
 .hidden {
     opacity: 0;
     visibility: hidden;
@@ -428,6 +439,7 @@ section {
 .section-title {
     user-select: none;
     width: 100%;
+    max-width: 1920px;
     text-align: center;
     font-size: 4rem;
     font-weight: 800;
@@ -459,6 +471,7 @@ section {
     
     gap: 15px;
     width: 90%;
+    max-width: 1920px;
     margin: 0 auto;
 }
 
@@ -1500,9 +1513,9 @@ section {
 .all-reviews-list .stars {
     order: 3;
     width: 100%;
-    font-size:1.2rem;
+    font-size:1rem;
     margin-top: -5px;
-    margin-left: -2px;
+    margin-left: -0.2%;
 }
 
 .list-item-header {
@@ -1572,6 +1585,7 @@ section {
     font-size: 3rem;
     margin-top: -20px;
     text-decoration: none;
+    letter-spacing: 6px;
     color: #FA8FFF;
 }
 
