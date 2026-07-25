@@ -51,7 +51,7 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
                 resetButton(btn, originalText);
             },
             "theme": {
-                "color": "#FA8FFF"
+                "color": "#ff00dd"
             }
         };
 
