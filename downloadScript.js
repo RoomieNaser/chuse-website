@@ -75,7 +75,7 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
 function triggerDownload() {
     const link = document.createElement('a');
     link.href = 'assets/LYA.mp3'; //change to actual file link using either github or gDrive
-    link.target = '_blank';
+    link.download = "WeAreCHUSE Full Album";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
