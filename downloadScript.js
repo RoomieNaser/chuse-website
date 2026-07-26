@@ -75,6 +75,7 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
 function triggerDownload(isPremium = false) {
     if (isPremium) {
         //paid for it, thanks vro
+        window.location.href = 'https://www.dropbox.com/scl/fi/f0j6orgg3n59hk1uvoe90/AlbumPreview.zip?rlkey=ek3sdkd67z4163cdfpmkpts7m&st=awyydk33&dl=1';
         window.location.href = 'https://www.dropbox.com/scl/fi/yipsd4go4vxl81m9fqd7g/SpecialGift.zip?rlkey=gj87mtz0qybils09i01bov3c5&st=8yjm1up9&dl=1'; 
     } else {
         //it free :D
