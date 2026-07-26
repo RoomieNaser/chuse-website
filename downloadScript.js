@@ -9,7 +9,7 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
     const amount = parseFloat(priceInput);
 
     if (amount === 0) {
-        triggerDownload();
+        triggerDownload(false);
         return;
     }
 
@@ -40,14 +40,14 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
             "amount": order.amount,
             "currency": "INR",
             "name": "WeAreCHUSÉ",
-            "description": "Album's Digital Download", //change this to album name later
+            "description": "Album's Digital Download", 
             "order_id": order.id,
             "prefill": {
                 "email": userEmail
             },
             "handler": function (response) {
                 alert("Payment Successful! Thank you sm for the support <3");
-                triggerDownload();
+                triggerDownload(true); 
                 resetButton(btn, originalText);
             },
             "theme": {
@@ -72,17 +72,17 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
 });
 
 //helpers
-function triggerDownload() {
-    const link = document.createElement('a');
-    link.href = 'assets/LYA.mp3'; //change to actual file link using either github or gDrive
-    link.download = "WeAreCHUSE Full Album";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+function triggerDownload(isPremium = false) {
+    if (isPremium) {
+        //paid for it, thanks vro
+        window.location.href = 'https://www.dropbox.com/scl/fi/yipsd4go4vxl81m9fqd7g/SpecialGift.zip?rlkey=gj87mtz0qybils09i01bov3c5&st=8yjm1up9&dl=1'; 
+    } else {
+        //it free :D
+        window.location.href = 'https://www.dropbox.com/scl/fi/f0j6orgg3n59hk1uvoe90/AlbumPreview.zip?rlkey=ek3sdkd67z4163cdfpmkpts7m&st=awyydk33&dl=1';
+    }
 }
 
 function resetButton(btn, txt) {
     btn.innerText = txt;
     btn.disabled = false;
 }
-
