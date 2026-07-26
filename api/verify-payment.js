@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         if (expectedSignature === razorpay_signature) {
             return res.status(200).json({
                 success: true,
-                links: [freeLink, premiumLink]
+                links: [premiumLink]
             });
         } else {
             return res.status(500).json({

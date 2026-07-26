@@ -76,7 +76,6 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
 //my servants muahahahahha
 async function triggerDownload(paymentData) {
     try {
-        //ask the server for the links
         const res = await fetch('/api/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -85,16 +84,8 @@ async function triggerDownload(paymentData) {
         
         const data = await res.json();
 
-        if (data.success && data.links) {
-            data.links.forEach((link, index) => {
-                setTimeout(() => {
-                    const a = document.createElement('a');
-                    a.href = link;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }, index * 500);
-            });
+        if (data.success && data.links && data.links.length > 0) {
+            window.location.href = data.links[0]; 
         } else {
             alert("Security check failed! Could not verify payment.");
         }
