@@ -77,7 +77,7 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
 async function triggerDownload(paymentData) {
     try {
         //ask the server for the links
-        const res = await fetch('api/verify-payment', {
+        const res = await fetch('/api/verify-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(paymentData)
