@@ -8,23 +8,24 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
     const userEmail = document.getElementById('user-email').value;
     const amount = parseFloat(priceInput);
 
+    //BROKE AHH
     if (amount === 0) {
-        triggerDownload(false);
+        btn.innerText = "Getting your album...";
+        btn.disabled = true;
+        await triggerDownload({ isFree: true });
+        resetButton(btn, originalText);
         return;
     }
 
+    //RICH KIDDOS
     btn.innerText = "Loading...";
     btn.disabled = true;
 
     try {
         const response = await fetch('/api/create-order', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                amount: amount
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: amount })
         });
         
         const order = await response.json();
@@ -42,26 +43,27 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
             "name": "WeAreCHUSÉ",
             "description": "Album's Digital Download", 
             "order_id": order.id,
-            "prefill": {
-                "email": userEmail
-            },
-            "handler": function (response) {
+            "prefill": { "email": userEmail },
+            "handler": async function (response) {
+                btn.innerText = "Verifying...";
+                //pass the proof, needed ai for this
+                await triggerDownload({
+                    isFree: false,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature
+                });
                 alert("Payment Successful! Thank you sm for the support <3");
-                triggerDownload(true); 
                 resetButton(btn, originalText);
             },
-            "theme": {
-                "color": "#ff00dd"
-            }
+            "theme": { "color": "#ff00dd" }
         };
 
         const rzp = new Razorpay(options);
-
         rzp.on('payment.failed', function (response){
             alert("Payment failed or could not be processed. Please try again.");
             resetButton(btn, originalText);
         });
-
         rzp.open();
 
     } catch (error) {
@@ -71,27 +73,34 @@ document.getElementById('download-form').addEventListener('submit', async (e) =>
     }
 });
 
-//helpers
-function triggerDownload(isPremium = false) {
-    if (isPremium) {
-        // paid for it, thanks vro
-        const downloadFile = (url) => {
-            const link = document.createElement('a');
-            link.href = url;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        };
+//my servants muahahahahha
+async function triggerDownload(paymentData) {
+    try {
+        //ask the server for the links
+        const res = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(paymentData)
+        });
+        
+        const data = await res.json();
 
-        downloadFile('https://www.dropbox.com/scl/fi/f0j6orgg3n59hk1uvoe90/AlbumPreview.zip?rlkey=ek3sdkd67z4163cdfpmkpts7m&st=awyydk33&dl=1');
-
-        setTimeout(() => {
-            downloadFile('https://www.dropbox.com/scl/fi/yipsd4go4vxl81m9fqd7g/SpecialGift.zip?rlkey=gj87mtz0qybils09i01bov3c5&st=8yjm1up9&dl=1');
-        }, 500);
-
-    } else {
-        // it free :D
-        window.location.href = 'https://www.dropbox.com/scl/fi/f0j6orgg3n59hk1uvoe90/AlbumPreview.zip?rlkey=ek3sdkd67z4163cdfpmkpts7m&st=awyydk33&dl=1';
+        if (data.success && data.links) {
+            data.links.forEach((link, index) => {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = link;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }, index * 500);
+            });
+        } else {
+            alert("Security check failed! Could not verify payment.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Failed to retrieve the download links.");
     }
 }
 
